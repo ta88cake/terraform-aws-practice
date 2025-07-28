@@ -74,7 +74,7 @@ resource "aws_route_table" "my_public_rt" {
 # --- ルートテーブルとサブネットの関連付け ---
 resource "aws_route_table_association" "public_subnet_assoc" {
   # どのサブネットに...
-  subnet_id      = aws_subnet.my_public_subnet.id
+  subnet_id = aws_subnet.my_public_subnet.id
   # ...どのルートテーブルを適用するか
   route_table_id = aws_route_table.my_public_rt.id
 }
@@ -85,7 +85,7 @@ resource "aws_security_group" "web_server_sg" {
   name        = "web-server-sg"
   description = "Allow HTTP traffic for web server"
   # どのVPCに属するセキュリティグループかを指定
-  vpc_id      = aws_vpc.my_first_vpc.id
+  vpc_id = aws_vpc.my_first_vpc.id
 
   # 「イングレス（内向き）」のルール
   # どんな通信の進入を許可するか
@@ -101,9 +101,9 @@ resource "aws_security_group" "web_server_sg" {
   # 「エグレス（外向き）」のルール
   # どこへの通信を許可するか
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1" # "-1" は「すべてのプロトコル」を意味する
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1" # "-1" は「すべてのプロトコル」を意味する
     # 基本的に、出ていく通信はすべて許可するのが一般的
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -118,14 +118,14 @@ resource "aws_security_group" "web_server_sg" {
 resource "aws_instance" "my_web_server" {
   # どのOSイメージを使うか？
   # ここで、以前データソースで取得した最新のAmazon Linux 2のAMI IDを使います！
-  ami           = data.aws_ami.latest_amazon_linux.id
+  ami = data.aws_ami.latest_amazon_linux.id
 
   # どの性能のサーバーにするか？ (一番小さい無料利用枠のタイプ)
   instance_type = "t2.micro"
 
   # どのサブネットに配置するか？
   # 我々が作ったパブリックサブネットを指定します。
-  subnet_id     = aws_subnet.my_public_subnet.id
+  subnet_id = aws_subnet.my_public_subnet.id
 
   # どのセキュリティグループを適用するか？
   # 我々が作ったWebサーバー用のセキュリティグループを指定します。
