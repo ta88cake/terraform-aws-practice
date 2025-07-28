@@ -1,0 +1,43 @@
+# .github/workflows/terraform-check.yml
+
+# ワークフローの名前
+name: 'Terraform Check'
+
+# このワークフローが実行される「きっかけ（トリガー）」
+on:
+  # mainブランチにプッシュされた時
+  push:
+    branches:
+      - main
+  # プルリクエストが作成された時
+  pull_request:
+
+# 実行される「仕事（ジョブ）」
+jobs:
+  # 'terraform' という名前のジョブ
+  terraform:
+    name: 'Terraform Checks'
+    # ubuntu-latest という仮想マシン上で実行します
+    runs-on: ubuntu-latest
+
+    # 仕事の具体的な「手順（ステップ）」
+    steps:
+      # ① リポジトリのコードを仮想マシンに持ってくる
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ② Terraformの実行環境をセットアップする
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # ③ コードのフォーマットが正しいかチェックする
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      # ④ Terraformの初期化（プロバイダーをダウンロード）
+      - name: Terraform Init
+        run: terraform init -backend=false # AWSに接続しないのでbackendは不要
+
+      # ⑤ Terraformの文法が正しいか検証する
+      - name: Terraform Validate
+        run: terraform validate -no-color
