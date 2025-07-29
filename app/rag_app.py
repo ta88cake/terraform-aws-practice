@@ -72,3 +72,5 @@ def ask_question(request: QuestionRequest):
     result = qa_chain.invoke({"query": request.query})
     # 結果を返す
     return {"answer": result["result"], "source_documents": result["source_documents"]}
+# app/main.py の一番最後に追記
+# Trigger Docker CI workflow
