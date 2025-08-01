@@ -101,7 +101,16 @@ resource "aws_security_group" "web_server_sg" {
     # "0.0.0.0/0" は「どこからでも」を意味する特別なCIDRブロック
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+  ingress {
+    description = "SSH from My IP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    # 【注意】セキュリティのため、自分のIPアドレスに限定するのがベスト
+    # ひとまず練習なので "0.0.0.0/0" (どこからでも) で開けますが、
+    # 本来はここに自分のグローバルIPアドレスを指定します。
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   # 「エグレス（外向き）」のルール
   # どこへの通信を許可するか
   egress {
