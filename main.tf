@@ -159,8 +159,9 @@ resource "aws_instance" "my_web_server" {
             # Docker Hubから、CIパイプラインがビルドしたイメージをpullして実行
             # docker run -d -p 80:80 [あなたのDocker Hubユーザー名]/terraform-aws-practice:latest
             # ↓↓↓ 【重要】下の行の "ta88cake" の部分を、あなたのDocker Hubユーザー名に書き換えてください！
-            docker run -d -p 80:80 --name rag-app ta88cake/terraform-aws-practice:latest
+            docker run -d -p 80:8000 --name rag-app ta88cake/terraform-aws-practice:latest
             EOF
+          
 
   # EC2インスタンスに名前をつけるためのタグ
   tags = {
