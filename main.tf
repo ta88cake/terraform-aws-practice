@@ -126,7 +126,7 @@ resource "aws_instance" "my_web_server" {
 
   # どの性能のサーバーにするか？ (一番小さい無料利用枠のタイプ)
   instance_type = "t2.micro"
-  
+
   # どのサブネットに配置するか？
   # 我々が作ったパブリックサブネットを指定します。
   subnet_id = aws_subnet.my_public_subnet.id
