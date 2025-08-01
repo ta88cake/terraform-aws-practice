@@ -147,6 +147,7 @@ resource "aws_instance" "my_web_server" {
   # 起動時に簡単なWebサーバーをインストールするスクリプト
   # これにより、起動後すぐにWebページが表示されるようになります。
   # user_data を、Dockerをインストールし、Docker Hubからイメージをpullして実行するスクリプトに書き換える
+  # user_data を、Dockerコンテナをsystemdサービスとして登録するスクリプトに書き換える
   user_data = <<-EOF
             #!/bin/bash
             # Dockerのインストール
@@ -156,10 +157,31 @@ resource "aws_instance" "my_web_server" {
             systemctl enable docker
             usermod -aG docker ec2-user
 
-            # Docker Hubから、CIパイプラインがビルドしたイメージをpullして実行
-            # docker run -d -p 80:80 [あなたのDocker Hubユーザー名]/terraform-aws-practice:latest
-            # ↓↓↓ 【重要】下の行の "ta88cake" の部分を、あなたのDocker Hubユーザー名に書き換えてください！
-            docker run -d --restart always -p 80:8000 --name rag-app ta88cake/terraform-aws-practice:latest
+            # Docker Hubからイメージをpull
+            docker pull ta88cake/terraform-aws-practice:latest
+
+            # systemdのサービス定義ファイルを作成
+            cat <<'EOT' > /etc/systemd/system/rag-app.service
+            [Unit]
+            Description=RAG Application Container
+            After=docker.service
+            Requires=docker.service
+
+            [Service]
+            TimeoutStartSec=0
+            Restart=always
+            ExecStartPre=-/usr/bin/docker exec %n stop
+            ExecStartPre=-/usr/bin/docker rm %n
+            ExecStartPre=/usr/bin/docker pull ta88cake/terraform-aws-practice:latest
+            ExecStart=/usr/bin/docker run --rm -p 80:8000 --name %n ta88cake/terraform-aws-practice:latest
+
+            [Install]
+            WantedBy=multi-user.target
+            EOT
+
+            # systemdサービスを有効化して起動
+            systemctl enable rag-app.service
+            systemctl start rag-app.service
             EOF
 
 
