@@ -133,14 +133,21 @@ resource "aws_instance" "my_web_server" {
 
   # 起動時に簡単なWebサーバーをインストールするスクリプト
   # これにより、起動後すぐにWebページが表示されるようになります。
+  # user_data を、Dockerをインストールし、Docker Hubからイメージをpullして実行するスクリプトに書き換える
   user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y httpd
-              systemctl start httpd
-              systemctl enable httpd
-              echo "<h1>Hello, World from Terraform EC2!</h1>" > /var/www/html/index.html
-              EOF
+            #!/bin/bash
+            # Dockerのインストール
+            yum update -y
+            yum install -y docker
+            systemctl start docker
+            systemctl enable docker
+            usermod -aG docker ec2-user
+
+            # Docker Hubから、CIパイプラインがビルドしたイメージをpullして実行
+            # docker run -d -p 80:80 [あなたのDocker Hubユーザー名]/terraform-aws-practice:latest
+            # ↓↓↓ 【重要】下の行の "ta88cake" の部分を、あなたのDocker Hubユーザー名に書き換えてください！
+            docker run -d -p 80:80 --name rag-app ta88cake/terraform-aws-practice:latest
+            EOF
 
   # EC2インスタンスに名前をつけるためのタグ
   tags = {

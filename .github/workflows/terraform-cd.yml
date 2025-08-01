@@ -1,0 +1,39 @@
+name: Terraform CD
+
+on:
+  # Docker CI ワークフローが成功したら、このワークフローを手動で実行できるようにする
+  workflow_run:
+    workflows: ["Docker CI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+    # jobにAWSへの書き込み権限を与える
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # AWSの認証情報を設定（OIDCを使用）
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # ↓↓↓ ここに、先ほどコピーしたIAMロールのARNを貼り付ける ↓↓↓
+          role-to-assume: arn:aws:iam::748955970371:role/github-actions-terraform-role
+          aws-region: ap-northeast-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        # -auto-approve を付けると、対話なしで自動的に apply を実行する
+        run: terraform apply -auto-approve
