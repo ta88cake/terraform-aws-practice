@@ -130,12 +130,11 @@ resource "aws_instance" "my_web_server" {
   # どのサブネットに配置するか？
   # 我々が作ったパブリックサブネットを指定します。
   subnet_id = aws_subnet.my_public_subnet.id
-
   # どのセキュリティグループを適用するか？
   # 我々が作ったWebサーバー用のセキュリティグループを指定します。
   vpc_security_group_ids = [aws_security_group.web_server_sg.id]
 
-　key_name      = aws_key_pair.my_key.key_name
+  key_name = aws_key_pair.my_key.key_name
   # 起動時に簡単なWebサーバーをインストールするスクリプト
   # これにより、起動後すぐにWebページが表示されるようになります。
   # user_data を、Dockerをインストールし、Docker Hubからイメージをpullして実行するスクリプトに書き換える
