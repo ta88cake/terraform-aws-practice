@@ -3,3 +3,5 @@
 *.tfstate.*
 *.tfvars
 .terraform.lock.hcl
+# .gitignore に追記
+my-key

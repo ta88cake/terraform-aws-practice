@@ -19,6 +19,10 @@ resource "aws_vpc" "my_first_vpc" {
 }
 # main.tf (追記)
 
+resource "aws_key_pair" "my_key" {
+  key_name   = "my-first-key"
+  public_key = file("my-key.pub")
+}
 # --- サブネットリソースの定義 ---
 resource "aws_subnet" "my_public_subnet" {
   # このサブネットが、どのVPCに属するかを指定します。
@@ -122,7 +126,7 @@ resource "aws_instance" "my_web_server" {
 
   # どの性能のサーバーにするか？ (一番小さい無料利用枠のタイプ)
   instance_type = "t2.micro"
-
+  
   # どのサブネットに配置するか？
   # 我々が作ったパブリックサブネットを指定します。
   subnet_id = aws_subnet.my_public_subnet.id
@@ -131,6 +135,7 @@ resource "aws_instance" "my_web_server" {
   # 我々が作ったWebサーバー用のセキュリティグループを指定します。
   vpc_security_group_ids = [aws_security_group.web_server_sg.id]
 
+　key_name      = aws_key_pair.my_key.key_name
   # 起動時に簡単なWebサーバーをインストールするスクリプト
   # これにより、起動後すぐにWebページが表示されるようになります。
   # user_data を、Dockerをインストールし、Docker Hubからイメージをpullして実行するスクリプトに書き換える
